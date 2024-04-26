@@ -73,25 +73,24 @@ class TestCommands(TestCase):
 
     # Added this to test editing bookmarks
     def test_command_edit(self):
-        # Modify the data for the first bookmark
-        modified_data = DomainBookmark(
-            id=1,
-            title="Awesomer Django",
-            url="https://awesomedjango.org/",
-            notes="Best place on the web for Django just got better.",
-            date_added=self.domain_bookmark_1.date_added,
-        )
 
-        # Create an instance of EditBookmarkCommand
+        add_command = AddBookmarkCommand()
+        add_command.execute(self.domain_bookmark_1)
+
+        # using command
+        # get_command = GetBookmarkCommand()
+        # domain_bookmark_temp = get_command.execute(self.domain_bookmark_1.id)
+        # domain_bookmark_temp.title = "Goofy"
+
+        # or just modify
+        self.domain_bookmark_1.title = "goofy"
+
         edit_command = EditBookmarkCommand()
+        edit_command.execute(self.domain_bookmark_1)
 
-        # Execute the edit command
-        edit_command.execute(modified_data)
+        # run checks
+        # one object is inserted
+        self.assertEqual(Bookmark.objects.count(), 1)
 
-        # Fetch the updated bookmark from the database
-        updated_bookmark = Bookmark.objects.get(id=1)
-
-        # Check if the bookmark attributes have been updated correctly
-        self.assertEqual(updated_bookmark.title, modified_data.title)
-        self.assertEqual(updated_bookmark.url, modified_data.url)
-        self.assertEqual(updated_bookmark.notes, modified_data.notes)
+        # that object is the same as the one we inserted
+        self.assertEqual(Bookmark.objects.get(id=1).title, "goofy")
